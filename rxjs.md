@@ -144,7 +144,7 @@ fromEventPattern(addListener,removeListener)
 
 即将弃用 改用常量EMPTY
 
-```
+```typescript
 empty().subscribe({
   next: () => console.log('Next'),
   complete: () => console.log('Complete!')
@@ -156,7 +156,7 @@ empty().subscribe({
 
 等同于
 
-```
+```typescript
 import { EMPTY } from 'rxjs';
 
 EMPTY.subscribe({
@@ -187,9 +187,57 @@ EMPTY.subscribe({
 
 `interval(n)`等同于`timer(n,n)`
 
+#### range
+
+range(n,m) 立即按顺序从n开始发出m个值 每次加1
+
+### Transformation Operators
+
+转换操作符，在pipe()中调用
+
+#### map
+
+类似数组的map,所有通过的值经过map中的表达式转换成其他值发出。
+
+```tsx
+const source = interval(1000)
+const newest = source.pipe(map(x=> x + 2));
+
+source.subscribe( res =>  console.log(res));
+// 0
+// 1
+// ...
+newest.subscribe( res =>  console.log(res));
+// 2
+// 3
+// ...
+```
+
+#### mapTo
+
+把经过的值改为固定值
+
+```tsx
+interval(1000).pipe(map(2)).subscribe( res => console.log(res));
+// 2
+// 2
+// ...
+```
+
+
 ### Filtering Operators
 
 过滤操作符、订阅前过滤条件，在pipe()中调用
+
+
+#### filter
+
+通过的值符合表达式才能发出
+
+````tsx
+interval(1000).pipe(filter( x => x === 2)).subscribe( res => console.log(res));
+// 2
+````
 
 #### take
 
@@ -210,9 +258,126 @@ var handler = (e) => {
 document.body.addEventListener('click', handler);
 ```
 
+#### skip
+
+skip(n) ，略n次后发出值
+
+#### takeLast
+
+takeLast(n)取observer调用complete()前n个值，立刻同步发出
+
+#### last
+
+last() 同 takeLast(1)，或者接收两个参数
+
+```typescript
+const source = from(['x', 'y', 'z']);
+const example = source.pipe(last(char => char === 'a','not exist'));
+//output: "'a' is not exist."
+example.subscribe(val => console.log(`'a' is ${val}.`));
+```
+
+
+
+#### first
+
+取第一个符合其中表达式的值发出，无表达式直接取第一个
+
+```typescript
+interval(1000).pipe(first( x => x > 2)).subscribe( res => console.log(res));
+// 3
+```
+
+#### takeUntil
+
+接受一个Observable，其中的Observable发出值后，所过滤的Observable停止订阅
+
+```typescript
+const source = interval(1000);
+const clicks = fromEvent(document, 'click');
+const result = source.pipe(takeUntil(clicks));
+result.subscribe(x => console.log(x));
+
+// 订阅到网页受到点击
+```
+
+### Join Operators
+
+#### concatAll
+
+用来把多个observer连起来，需要通过的值是observer
+
+```typescript
+var click = fromEvent(document.body, 'click');
+var example = click.pipe(map(e => Rx.Observable.of(1,2,3)),concatAll());
+example.subscribe({
+    next: (value) => { console.log(value); },
+    error: (err) => { console.log('Error: ' + err); },
+    complete: () => { console.log('complete'); }
+});
+// 每次点击页面 连续发出 1，2，3
+```
+
+```typescript
+var obs1 = interval(1000).pipe(take(5));
+var obs2 = interval(500).pipe(take(2));
+var obs3 = interval(2000).pipe(take(1));
+
+var source = of(obs1, obs2, obs3);
+
+var example = source.pipe(concatAll());
+
+example.subscribe({
+    next: (value) => { console.log(value); },
+    error: (err) => { console.log('Error: ' + err); },
+    complete: () => { console.log('complete'); }
+});
+// 0
+// 1
+// 2
+// 3
+// 4
+// 0
+// 1
+// 0
+// complete
+```
+
+### Join Creation Operators
+
+#### concat
+
+
+
+### 相关应用
+
+#### 编写dom拖拽
+
+```typescript
+const dragDOM = document.getElementById('drag');
+const body = document.body;
+
+const mouseDown = fromEvent(dragDOM, 'mousedown');
+const mouseUp = fromEvent(body, 'mouseup');
+const mouseMove = fromEvent(body, 'mousemove');
+/
+mouseDown.pipe(
+  map(event => mouseMove.pipe(takeUntil(mouseUp)) ),
+  concatAll(),
+  map(event => ({ x: event.clientX, y: event.clientY }))
+).subscribe(pos => {
+  	dragDOM.style.left = pos.x + 'px';
+    dragDOM.style.top = pos.y + 'px';
+  })
+```
+
+
+
+
+
 ## 参考
 
-[30 天精通 RxJS]: https://blog.jerry-hong.com/series/rxjs/thirty-days-RxJS-00
+30 天精通 RxJS: https://blog.jerry-hong.com/series/rxjs/thirty-days-RxJS-00
 
-[ rxjs ]: https://rxjs.dev/guide/overview
+ rxjs : https://rxjs.dev/guide/overview
 
