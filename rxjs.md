@@ -343,11 +343,49 @@ example.subscribe({
 // complete
 ```
 
+#### startWith
+
+在通过的observer前面加一个值，立即发出
+
+```typescript
+interval(1000).pipe(startWith(233)).subscribe(res => console.log(res));
+// 233
+// 0
+// 1
+// ...
+```
+
+
+
 ### Join Creation Operators
 
 #### concat
 
+可以直接concat()，创建Observable ，也可以在pipe()中使用，把不同Observable 依次连接起来发出。
 
+与concatAll的区别是，concatAll直接让Observable 对象通过取出其中的值，concat()把接收的参数Observable 连接起来发出。
+
+#### merge
+
+和concat类似，但concat是前一个Observable complete后，下一个Observable 才开始，merge是直接合并，同时开始。当Observable都结束，整个Observable 才算结束。
+
+#### combineLatest
+
+ 接收可迭代的Observable，转换输出上一次的值。
+
+[examples](https://rxjs.dev/api/index/function/combineLatest#examples)
+
+#### zip
+
+组合多个Observable ，每次发出值类似foreach，是每个Observable 的第n个值，有木桶效应，发出的个数等于最小个数的Observable 
+
+[example](https://rxjs.dev/api/index/function/zip#example)
+
+如果其中一个Observable 数量很少，其他的很多，没有在恰当的时机取消订阅，内存会一直记录其他连续发出的值，内存会得不到释放
+
+#### withLatestFrom
+
+和combineLatest类似，但在pipe中使用， 主Observable 发出时才发出，而combineLatest是其中任意一个Observable 就发出。
 
 ### 相关应用
 
@@ -360,7 +398,7 @@ const body = document.body;
 const mouseDown = fromEvent(dragDOM, 'mousedown');
 const mouseUp = fromEvent(body, 'mouseup');
 const mouseMove = fromEvent(body, 'mousemove');
-/
+
 mouseDown.pipe(
   map(event => mouseMove.pipe(takeUntil(mouseUp)) ),
   concatAll(),
@@ -371,7 +409,9 @@ mouseDown.pipe(
   })
 ```
 
+#### 视频网站浮动小视窗
 
+[实例](https://stackblitz.com/edit/rxjs-demo-video-float)
 
 
 
@@ -380,4 +420,5 @@ mouseDown.pipe(
 30 天精通 RxJS: https://blog.jerry-hong.com/series/rxjs/thirty-days-RxJS-00
 
  rxjs : https://rxjs.dev/guide/overview
+
 
