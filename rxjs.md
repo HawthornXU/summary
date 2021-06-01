@@ -224,6 +224,65 @@ interval(1000).pipe(map(2)).subscribe( res => console.log(res));
 // ...
 ```
 
+#### scan
+
+相当于js中的reduce，可以把发出的值累加。
+
+```typescript
+var example = from('hello').pipe(
+			scan((origin, next) => origin + next, ''));
+
+example.subscribe(
+   (value) => { console.log(value); },
+     (err) => { console.log('Error: ' + err); },
+     () => { console.log('complete'); });
+// h
+// he
+// hel
+// hell
+// hello
+// complete
+```
+
+#### buffer
+
+buffer(n:Observable) , 根据参数Observable 的发出频率，按组发出通过的Observable 的值。
+
+```typescript
+interval(300).pipe(
+	buffer(interval(1000))
+	).subscribe( (value) => { console.log(value); },
+    (err) => { console.log('Error: ' + err); },
+     () => { console.log('complete'); }
+);
+// [0,1,2]
+// [3,4,5]
+// [6,7,8]...
+```
+
+#### bufferTime
+
+bufferTime 可以优化上一个例子：
+
+```typescript
+interval(300).pipe(
+	bufferTime(1000) )
+```
+
+#### bufferCount
+
+bufferCount(n)，根据传入的数字分组发出值
+
+```typescript
+from([0,1,2,3,4,5]).pipe(bufferCount(2)).subscribe( (value) => { console.log(value); },
+    (err) => { console.log('Error: ' + err); },
+     () => { console.log('complete'); }
+);
+// [0,1]
+// [2,3]
+// [4,5]
+// complete
+```
 
 ### Filtering Operators
 
@@ -264,7 +323,7 @@ skip(n) ，略n次后发出值
 
 #### takeLast
 
-takeLast(n)取observer调用complete()前n个值，立刻同步发出
+takeLast(n)取Observable调用complete()前n个值，立刻同步发出
 
 #### last
 
@@ -276,8 +335,6 @@ const example = source.pipe(last(char => char === 'a','not exist'));
 //output: "'a' is not exist."
 example.subscribe(val => console.log(`'a' is ${val}.`));
 ```
-
-
 
 #### first
 
@@ -301,11 +358,48 @@ result.subscribe(x => console.log(x));
 // 订阅到网页受到点击
 ```
 
+#### debounceTime
+
+如其名称多用于防抖
+
+```typescript
+fromEvent(searchInput, 'input').pipe(
+   debounceTime(300),
+   map(e => e.target.value)
+).subscribe((value) => {
+    // 这里发送 request
+  })
+```
+
+#### debounce
+
+debounce接受一个Observable，使用方法类似buffer，bufferTime相对应debounceTime，单独控制每一个发出值的性状
+
+#### throttleTime
+
+用于节流
+
+```typescript
+var example = interval(300).pipe(take(5),throttleTime(1000));
+
+example.subscribe((value) => { console.log(value); },
+    (err) => { console.log('Error: ' + err); },
+     () => { console.log('complete'); }
+);
+// 0
+// 4
+// complete
+```
+
+#### throttle
+
+同样类似buffer，接受一个Observable，单独控制每一个发出值的性状
+
 ### Join Operators
 
 #### concatAll
 
-用来把多个observer连起来，需要通过的值是observer
+用来把多个Observable连起来，需要通过的值是Observable
 
 ```typescript
 var click = fromEvent(document.body, 'click');
@@ -387,6 +481,31 @@ interval(1000).pipe(startWith(233)).subscribe(res => console.log(res));
 
 和combineLatest类似，但在pipe中使用， 主Observable 发出时才发出，而combineLatest是其中任意一个Observable 就发出。
 
+### Utility Operators
+
+#### dalay
+
+dalay(n:number|Date), 延迟n毫秒发出或在指定日期之后发出
+
+#### delayWhen
+
+接受一个回调函数，返回Observable 可以对每个值单独做处理。
+
+```typescript
+// 每次点击延迟 0~5秒
+const clicks = fromEvent(document, 'click');
+const delayedClicks = clicks.pipe(
+  delayWhen(event => interval(Math.random() * 5000)),
+);
+//每个值分别延迟x*x秒
+interval(300).pipe(take(5),
+                  delayWhen(x => EMPTY.pipe(delay(100 * x * x))).subscribe( x => 
+                                                                          console.log(x))
+//--0---1----2-----3-----4
+```
+
+
+
 ### 相关应用
 
 #### 编写dom拖拽
@@ -413,6 +532,15 @@ mouseDown.pipe(
 
 [实例](https://stackblitz.com/edit/rxjs-demo-video-float)
 
+#### 鼠标双击
+
+```typescript
+fromEvent(button, 'click').pipe(
+    		bufferTime(500),
+			filter(arr => arr.length >= 2)
+            );
+```
+
 
 
 ## 参考
@@ -420,5 +548,4 @@ mouseDown.pipe(
 30 天精通 RxJS: https://blog.jerry-hong.com/series/rxjs/thirty-days-RxJS-00
 
  rxjs : https://rxjs.dev/guide/overview
-
 
