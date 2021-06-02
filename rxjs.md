@@ -395,6 +395,34 @@ example.subscribe((value) => { console.log(value); },
 
 同样类似buffer，接受一个Observable，单独控制每一个发出值的性状
 
+#### distinct
+
+可以把通过的值去重，不传值直接比对通过的值，传入回调按照回调里的规则比对去重
+
+```typescript
+from(['a', 'b', 'c', 'a', 'b']).pipe(distinct()).subscribe( 
+    value => { console.log(value)},
+    e => {console.log('e')},
+    () => { console.log('complete')}
+);
+// a
+// b
+// c
+// complete
+const example = from([{ value: 'a'}, { value: 'b' }, { value: 'c' }, { value: 'a' }, { value: 'c' }])
+example.pipe(distinct((x) => {
+    return x.value
+}).subscribe(    
+    value => { console.log(value)},
+    e => {console.log('e')},
+    () => { console.log('complete')}
+);
+// {value: "a"}
+// {value: "b"}
+// {value: "c"}
+// complete
+```
+
 ### Join Operators
 
 #### concatAll
