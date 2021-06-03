@@ -284,6 +284,30 @@ from([0,1,2,3,4,5]).pipe(bufferCount(2)).subscribe( (value) => { console.log(val
 // complete
 ```
 
+#### concatMap
+
+等于map + concatAll，把送过来的Observable 转成值后处理
+
+可以根据特性发送request ,可以取到每次的值。
+
+```typescript
+fromEvent(document.body, 'click').pipe(concatMap(e=> { /** 发http请求***/ })).subscribe()
+```
+
+#### switchMap
+
+等于map + switchAll
+
+可以根据特性发送request ,频繁发送时可以取到最新的值
+
+#### mergeMap
+
+ 等于mergeAll+map
+
+**switchMap, mergeMap, concatMap可以把传回的promise 直接转成observable**
+
+
+
 ### Filtering Operators
 
 过滤操作符、订阅前过滤条件，在pipe()中调用
@@ -399,6 +423,8 @@ example.subscribe((value) => { console.log(value); },
 
 可以把通过的值去重，不传值直接比对通过的值，传入回调按照回调里的规则比对去重
 
+其内部实现是set缓存，所以不要在无限值的Observable直接用
+
 ```typescript
 from(['a', 'b', 'c', 'a', 'b']).pipe(distinct()).subscribe( 
     value => { console.log(value)},
@@ -422,6 +448,10 @@ example.pipe(distinct((x) => {
 // {value: "c"}
 // complete
 ```
+
+#### distinctUntilChanged
+
+和distinct一样用于去重，但仅仅会和上一次发出的值比较。
 
 ### Join Operators
 
@@ -465,6 +495,10 @@ example.subscribe({
 // complete
 ```
 
+#### switchAll
+
+和concatAll很像，但concatAll是处理完一个Observable再处理一个，switchAll是来了新的Observable立刻取消订阅旧Observable开始新值的处理
+
 #### startWith
 
 在通过的observer前面加一个值，立即发出
@@ -477,7 +511,9 @@ interval(1000).pipe(startWith(233)).subscribe(res => console.log(res));
 // ...
 ```
 
+#### mergeAll
 
+接收到值直接合并处理，不会取消订阅旧的。
 
 ### Join Creation Operators
 
