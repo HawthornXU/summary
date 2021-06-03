@@ -306,7 +306,9 @@ fromEvent(document.body, 'click').pipe(concatMap(e=> { /** 发http请求***/ }))
 
 **switchMap, mergeMap, concatMap可以把传回的promise 直接转成observable**
 
+#### window
 
+window的行为和concatAll行为相对，concatAll是把经过的observable拍平成具体值，window是把经过的值分组转成observable
 
 ### Filtering Operators
 
@@ -568,8 +570,6 @@ interval(300).pipe(take(5),
 //--0---1----2-----3-----4
 ```
 
-
-
 ### 相关应用
 
 #### 编写dom拖拽
@@ -594,7 +594,7 @@ mouseDown.pipe(
 
 #### 视频网站浮动小视窗
 
-[实例](https://stackblitz.com/edit/rxjs-demo-video-float)
+[在线实例](https://stackblitz.com/edit/rxjs-demo-video-float)
 
 #### 鼠标双击
 
@@ -605,7 +605,9 @@ fromEvent(button, 'click').pipe(
             );
 ```
 
+#### 输入框auto complete
 
+[在线实例](https://stackblitz.com/edit/angular-rxjs-auto-complete)
 
 ## 参考
 
