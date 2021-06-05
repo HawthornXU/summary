@@ -310,6 +310,41 @@ fromEvent(document.body, 'click').pipe(concatMap(e=> { /** 发http请求***/ }))
 
 window的行为和concatAll行为相对，concatAll是把经过的observable拍平成具体值，window是把经过的值分组转成observable
 
+计算每秒点击的次数：
+
+```typescript
+fromEvent(document, 'click').pipe(window(interval(1000)),
+                                 map(innerObservable => innerObservable.pipe(count())),
+                                 switch()).subscribe(console)
+```
+
+不过这样应该buffer也可以实现。。。。
+
+#### windowToggle
+
+windowToggle(m$, () => n$)，m$是开始分组的observable，n$是结束的observable
+
+```typescript
+windowToggle(mouseDown, () => mouseUp)
+```
+
+#### groupBy
+
+可以把相同条件的值分组成observable
+
+计算奇偶数个数：
+
+````typescript
+from([0,1,2,3,4]).pipe(groupBy(x => x % 2),
+                        map(groupObserv => groupObserv.pipe(
+    													reduce((acc,curr) => acc+curr))
+                           ),mergeAll()).subscribe(console.log)
+//3
+// 2
+````
+
+
+
 ### Filtering Operators
 
 过滤操作符、订阅前过滤条件，在pipe()中调用
@@ -608,6 +643,46 @@ fromEvent(button, 'click').pipe(
 #### 输入框auto complete
 
 [在线实例](https://stackblitz.com/edit/angular-rxjs-auto-complete)
+
+## Subject
+
+Subject 是Observable 又是 Observer，所以它可以观察Observable ，也可以被订阅、观察
+
+所以可以用这种特性编写广播： 观察一个Observable 然后多处订阅就可以同时在多个地方取到值
+
+也可以在无法直接使用Observable 的情况下把事件转为Observable ：
+
+```js
+class MyButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { count: 0 };
+        this.subject = new Subject();
+        
+        this.subject.pipe(mapTo(1),
+                          scan((origin, next) => origin + next)).subscribe(x => {
+                this.setState({ count: x })
+            })
+    }
+    render() {
+        return <button onClick={event => this.subject.next(event)}>{this.state.count}</button>
+    }
+}
+```
+
+## BehaviorSubject
+
+Subject有个问题是订阅时不一定可以取到值 ，只有Subject.next()调用发出值，才可以接收到新的值
+
+而BehaviorSubject则可以在订阅时立刻取到最新的值，所以BehaviorSubject初始化时也要传入一个初始值`new BehaviorSubject(value)`
+
+## ReplaySubject
+
+ReplaySubject 和他的名字一样，在没有新值发出时可以回放值，`new ReplaySubject(n)`就是定义重放最后n个值
+
+## AsyncSubject
+
+AsyncSubject则是取complete()之前的一个值，就是结束订阅前最后一个值。
 
 ## 参考
 
