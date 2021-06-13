@@ -7,15 +7,16 @@
 * **[观念的转变: 学不如做, 实例驱动](https://github.com/niudai/How-to-be-a-good-programmer/blob/master/doc/abilities/ability_task_driven.md)**
 * **[学会输出知识, 尝试写文章](https://github.com/niudai/How-to-be-a-good-programmer/blob/master/doc/abilities/ability_articles.md)**
 
-## 目标
+## 目标（flag）
 
-- [x] rxjs及其实例总结（持续总结中。。。）
-- [ ] ngrx学习总结
-- [ ] http协议学习：
-
-  - - [x] HTTP状态码
+- [x] `rxjs`及实例总结（持续总结中。。。）
+- [ ] `ngrx`学习总结
+- [ ] `http`协议学习：
+- - [x] `HTTP`状态码
 - [x] 跨域解决方案
-- [ ] angular概念总结
-  - - [x] 依赖注入
-    - [x] 变更检测
+- [ ] `angular`概念总结
+- - [x] 依赖注入
+- - [x] 变更检测
+- [ ] `webpack`
+- [ ] `React`（学习使用中...）
 
