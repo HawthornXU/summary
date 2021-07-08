@@ -17,3 +17,19 @@ const foo = {bar:'baz'}
 react仅提供了dangerouslySetInnerHTML属性来警示传入的字符串 没有做DomSanitizer的工作，需要依赖第三方插件purify后再传入
 
 https://www.npmjs.com/package/sanitize-html
+
+## ngStyle
+
+```jsx
+const mystyle= {
+    color:#fff;
+}
+<react style={mystyle}></react>
+```
+
+## *NgIf
+
+```tsx
+{booleanValue && <react>booleanValue等于真</react>}
+```
+
