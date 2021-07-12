@@ -1,5 +1,23 @@
 # angular玩家react过渡总结手册
 
+## 生命周期
+
+### NgInit
+
+```jsx
+import React, { useEffect } from 'react';
+const reactComponent = (props) => {
+    useEffect( () => {
+	// do init
+	}, []);
+}
+//或者
+class reactComponent extends React.Component {
+  componentDidMount() {
+  }
+}
+```
+
 ## 父组件传值到子组件
 
 ```jsx
