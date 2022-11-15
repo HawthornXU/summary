@@ -75,14 +75,43 @@ function createTextElement(text) {
     }
 }
 
-const MyReact = {createElement}
+function render(element, container) {
+    const dom = element.type === "TEXT_ELEMENT"
+        ? document.createTextNode("")
+        : document.createElement(element,type);
+    
+    const isProperty = key => key !== "children";
+    
+    Object.keys(element.props)
+        .filter(isProperty)
+        .forEach(name => {
+            dom[name] = element.props[name]
+        })
+    
+    element.props.children.forEach(child => render(child, dom));
+    
+    container.appendChild(dom);
+}
 
-const element = MyReact.createElement(
-    "div",
-    {title: "foo"}, 
-    MyReact.createElement("a", null, "bar"),
-    MyReact.createElement("b")
+const MyReact = {createElement, render}
+
+// const element = MyReact.createElement(
+//     "div",
+//     {title: "foo"}, 
+//     MyReact.createElement("a", null, "bar"),
+//     MyReact.createElement("b")
+// )
+
+// 告诉Babel这个是jsx 实际上就是上面这段代码↑
+/** @jsx MyReact.createElement*/
+const element = (
+    <div id="foo">
+        <a>bar</a>
+        <b/>
+    </div>
 )
+
 const container = document.getElementById("root")
-ReactDom.render(element, container);
+MyReact.render(element, container);
 ```
+以上 就用MyReact完成了第一章所描述的行为
