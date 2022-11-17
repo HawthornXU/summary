@@ -211,7 +211,7 @@ render函数去渲染dom会耗时特别久，那么就引入浏览器任务切�
         }
         
         if (!nextUnitOfWork && wipRoot) {
-            comintRoot();
+            commitRoot();
         }
         
         requestIdleCallback(workLoop);
