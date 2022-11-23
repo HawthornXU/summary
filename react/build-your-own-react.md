@@ -398,16 +398,13 @@ render函数去渲染dom会耗时特别久，那么就引入浏览器任务切�
     
     // reconcile 调解
     function reconcileChildren(wipFiber, elements) {
+        let oldFiber = wipFiber.alternate && wipFiber.alternate.child
         let prevSibling = null;
 
-        for (let index = 0; index < elements.length; index++) {
+        for (let index = 0; index < elements.length || oldFiber != null; index++) {
             const element = elements[index];
-            const newFiber = {
-                type: element.type,
-                props: element.props,
-                parent: fiber,
-                dom: null
-            }
+            const newFiber = null
+            const sameType = oldFiber && element && element.type == oldFiber.type
             if (index === 0) {
                 wipFiber.child = newFiber;
             } else {
